@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 
-class MockQuantumSignal:
+class QuantumSignal:
     def __init__(self, signal_id, quantum_state, noise_level, fidelity_metrics):
         self.signal_id = signal_id
         self.quantum_state = quantum_state
@@ -13,35 +13,48 @@ class MockQuantumSignal:
         self.fidelity_metrics = fidelity_metrics
 
     def serialize(self):
-        return f"{self.signal_id}|{self.quantum_state}|{self.noise_level}|{','.join(map(str, self.fidelity_metrics))}".encode()
+        """Custom serialization into a secure format."""
+        serialized = f"{self.signal_id}|{self.quantum_state}|{self.noise_level}|{','.join(map(str, self.fidelity_metrics))}"
+        return serialized.encode()
 
     @staticmethod
     def deserialize(data):
-        components = data.decode().split("|")
-        fidelity_metrics = list(map(float, components[3].split(",")))
-        return MockQuantumSignal(components[0], components[1], float(components[2]), fidelity_metrics)
+        """Custom deserialization from the secure format."""
+        decoded = data.decode()
+        parts = decoded.split("|")
+        return QuantumSignal(
+            signal_id=parts[0],
+            quantum_state=parts[1],
+            noise_level=float(parts[2]),
+            fidelity_metrics=list(map(float, parts[3].split(",")))
+        )
 
-def encrypt_protobuf_with_mock_corrected(obj, key):
+def encrypt_signal(signal, key):
+    """Encrypt a serialized signal using AES-256."""
     backend = default_backend()
-    padder = padding.PKCS7(algorithms.AES.block_size).padder()
-    iv = os.urandom(16)  # Dynamically generated IV
+    iv = os.urandom(16)
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=backend)
+    padder = padding.PKCS7(algorithms.AES.block_size).padder()
     encryptor = cipher.encryptor()
 
-    serialized_data = obj.serialize()
+    serialized_data = signal.serialize()
     padded_data = padder.update(serialized_data) + padder.finalize()
-    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
-    return base64.b64encode(iv + encrypted_data)
+    encrypted = encryptor.update(padded_data) + encryptor.finalize()
 
-def decrypt_protobuf_with_mock_corrected(data, key):
+    return base64.b64encode(iv + encrypted)
+
+def decrypt_signal(encrypted_data, key):
+    """Decrypt an encrypted signal back to its original form."""
     backend = default_backend()
-    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
-    decoded_data = base64.b64decode(data)
-    iv = decoded_data[:16]  # Extract IV
-    encrypted_data = decoded_data[16:]
-
+    decoded_data = base64.b64decode(encrypted_data)
+    iv = decoded_data[:16]
+    encrypted = decoded_data[16:]
+    
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=backend)
     decryptor = cipher.decryptor()
-    padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
-    plaintext = unpadder.update(padded_data) + unpadder.finalize()
-    return MockQuantumSignal.deserialize(plaintext)
+    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+
+    decrypted_padded = decryptor.update(encrypted) + decryptor.finalize()
+    decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
+
+    return QuantumSignal.deserialize(decrypted)
