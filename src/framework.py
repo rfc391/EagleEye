@@ -58,3 +58,20 @@ def decrypt_signal(encrypted_data, key):
     decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
 
     return QuantumSignal.deserialize(decrypted)
+
+from configs.secure_message_pb2 import SecureMessage
+from utils.encryption import encrypt_message, decrypt_message
+
+def send_secure_message(sender, receiver, content, timestamp):
+    message = SecureMessage(
+        sender=sender,
+        receiver=receiver,
+        content=content,
+        timestamp=timestamp
+    )
+    encrypted_message = encrypt_message(message)
+    return encrypted_message
+
+def receive_secure_message(encrypted_message):
+    decrypted_message = decrypt_message(encrypted_message)
+    return decrypted_message
