@@ -59,8 +59,8 @@ def decrypt_signal(encrypted_data, key):
 
     return QuantumSignal.deserialize(decrypted)
 
-from configs.secure_message_pb2 import SecureMessage
-from utils.encryption import encrypt_message, decrypt_message
+from EagleEye.configs.secure_message_pb2 import SecureMessage
+from EagleEye.utils.encryption import encrypt_message, decrypt_message
 
 def send_secure_message(sender, receiver, content, timestamp):
     message = SecureMessage(

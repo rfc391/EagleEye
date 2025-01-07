@@ -1,7 +1,7 @@
 
 import unittest
 import os
-from src.framework import QuantumSignal, encrypt_signal, decrypt_signal
+from EagleEye.core.framework import QuantumSignal, encrypt_signal, decrypt_signal
 
 class TestQuantumSignal(unittest.TestCase):
     def setUp(self):
