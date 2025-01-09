@@ -2,3 +2,7 @@
 
 grpcio
 grpcio-tools
+opencv-python
+opencv-contrib-python
+py-immudb
+influxdb-client
