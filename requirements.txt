@@ -7,3 +7,4 @@ kafka-python
 pika
 redis
 psycopg2-binary
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
