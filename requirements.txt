@@ -2,3 +2,8 @@
 
 grpcio
 grpcio-tools
+
+kafka-python
+pika
+redis
+psycopg2-binary
