@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "Installing EagleEye..."
+pip3 install -r /opt/eagleeye/requirements.txt

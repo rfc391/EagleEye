@@ -1,10 +1,17 @@
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r /app/requirements.txt
-COPY . /app
-RUN pip install -r requirements.txt
-EXPOSE 5000
-CMD ["python", "main.py"]
+FROM python:3.10-slim
 
-# Install gRPC tools
+# Set environment
+ENV DEBIAN_FRONTEND=noninteractive
+WORKDIR /opt/eagleeye
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application source
+COPY src/ ./src/
+COPY config/ ./config/
+COPY scripts/ ./scripts/
+
+# Run the CLI by default
+ENTRYPOINT ["python3", "src/cli.py"]
