@@ -1,0 +1,20 @@
+[Unit]
+Description=EagleEye Secure Intelligence Automation Service
+After=network.target
+
+[Service]
+Type=simple
+User=robs3
+WorkingDirectory=/opt/eagleeye
+ExecStart=/opt/eagleeye/eagleeye-env/bin/python3 /opt/eagleeye/src/main.py
+Restart=on-failure
+RestartSec=5
+ProtectSystem=full
+ProtectHome=yes
+NoNewPrivileges=true
+PrivateTmp=true
+CapabilityBoundingSet=
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target
